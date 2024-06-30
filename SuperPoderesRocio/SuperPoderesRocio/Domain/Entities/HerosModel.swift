@@ -6,7 +6,6 @@
 //
 
 import Foundation
-// MARK: - SuperHeroResponse
 struct SuperHeroResponse: Codable {
     let code: Int
     let status: String
@@ -14,7 +13,7 @@ struct SuperHeroResponse: Codable {
     let attributionText: String
     let attributionHTML: String
     let etag: String
-    let data: SuperHeroData
+    let data: SuperHeroData?
 }
 
 // MARK: - SuperHeroData
@@ -26,13 +25,21 @@ struct SuperHeroData: Codable {
 // MARK: - SuperHero
 struct SuperHero: Codable, Identifiable, Hashable, Equatable {
     let id: Int
-    let name, description, modified: String
+    let title: String?// optional para Series
+    let name: String? // opcional para heros
+    let description: String? // Puede o no venir vacío
     let thumbnail: SuperHeroThumbnail
-    let resourceURI: String
-    var comics,stories, events: SuperHeroComics
-    var series:  SuperHeroComics
-    let urls: [SuperHeroURLElement]
-
+    let resourceURI: String?
+    
+    init(id: Int, title: String?, name: String?, description: String?, thumbnail: SuperHeroThumbnail, resourceURI: String?) {
+            self.id = id
+            self.title = title
+            self.name = name
+            self.description = description
+            self.thumbnail = thumbnail
+            self.resourceURI = resourceURI
+        }
+    
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
@@ -42,6 +49,37 @@ struct SuperHero: Codable, Identifiable, Hashable, Equatable {
     }
 }
 
+// MARK: - SuperHeroThumbnail
+struct SuperHeroThumbnail: Codable {
+    let path: String
+    let `extension`: String
+
+    enum CodingKeys: String, CodingKey {
+        case path
+        case `extension` = "extension"
+    }
+    init(path: String, extension: String) {
+            self.path = path
+            self.extension = `extension`
+        }
+
+    
+    enum ThumbnailType: String {
+        case portrait = "portrait_incredible"
+        case standard = "standard_xlarge"
+        case landscape = "landscape_amazing"
+    }
+
+    func url(type: ThumbnailType) -> String {
+        return "\(path)/\(type.rawValue).\(self.extension)"
+    }
+}
+
+enum Extension: String, Codable {
+    case gif = "gif"
+    case jpg = "jpg"
+    case png = "png"
+}
 // MARK: - SuperHeroComics
 struct SuperHeroComics: Codable {
     let available: Int
@@ -77,15 +115,7 @@ enum SuperHeroItemType: String, Codable {
 }
 
 // MARK: - SuperHeroThumbnail
-struct SuperHeroThumbnail: Codable {
-    let path: String
-    let `extension`: String
 
-    enum CodingKeys: String, CodingKey {
-        case path
-        case `extension` = "extension"
-    }
-}
 
 // MARK: - SuperHeroURLElement
 struct SuperHeroURLElement: Codable {

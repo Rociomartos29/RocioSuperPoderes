@@ -9,63 +9,69 @@ import SwiftUI
 
 struct HeroDetailView: View {
     let hero: SuperHero
-    @State var series: [Serie]
+    @StateObject var seriesViewModel = SeriesViewModel()
     @Environment(\.presentationMode) var presentationMode
     
-    @State private var heroImage: UIImage? = nil
-    @State private var seriesImages: [UIImage?] = []
-    
     var body: some View {
-        ScrollView(.vertical){
-            LazyVStack{
-                //titulo
-                HStack{
-                    Text(hero.name)
-                        .font(.title)
-                        .bold()
-                    
-                    Spacer()
-                }
-                .padding([.leading, .trailing],10)
-                
-                //Foto
-                AsyncImage(url: URL(string: "\(hero.thumbnail.path)"+".\(hero.thumbnail.extension)")) { image in
+        ScrollView(.vertical) {
+            VStack(alignment: .leading, spacing: 10) {
+                // Foto
+                AsyncImage(url: URL(string: "\(hero.thumbnail.path).\(hero.thumbnail.extension)")) { image in
                     image
                         .resizable()
                         .scaledToFit()
                         .cornerRadius(10)
-                        .padding([.leading, .trailing],20)
+                        .padding([.horizontal, .bottom])
                         .opacity(0.8)
                 } placeholder: {
                     ProgressView()
                 }
+                .frame(maxWidth: .infinity)
                 
-                //Description
-                Text(hero.description)
+                // Descripción
+                Text(hero.description ?? "")
                     .foregroundColor(.gray)
-                    .font(.caption)
-                    .padding([.leading, .trailing], 20)
-                
-                
-                Spacer()
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        ForEach(series) { serie in
-                            SeriesItemView(serie: serie, heroName: hero.name, series: series)
-                        }
-                    }
+                    .font(.body)
                     .padding(.horizontal)
-                    
+                
+                // Series
+                if let series = seriesViewModel.dataSeries?.data?.results {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        LazyHStack(spacing: 10) {
+                            ForEach(series) { serie in
+                                SeriesItemView(serie: serie)
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .frame(height: 120)
+                    .padding(.vertical)
+                } else {
+                    ProgressView()
+                        .padding(.vertical)
                 }
-                .padding(.vertical)
-                .onAppear {
-                    
-                    print("Number of series: \(series.count)")
+            }
+            .navigationTitle(hero.name ?? "")
+            .onAppear {
+                Task {
+                    await seriesViewModel.loadMarvelSeries(hero: hero.id)
                 }
             }
         }
     }
 }
+
 #Preview {
-    HeroDetailView(hero: SuperHero(id: 1,name: "Rocío", description: "Rocío, una guerrera feroz y noble, empuña su espada con destreza mientras defiende los reinos de la injusticia. Dotada de habilidades sobrenaturales y un coraje inquebrantable, Valquiria lucha sin descanso para proteger a los inocentes y hacer prevalecer la justicia en un mundo lleno de peligros. Su valentía inspira esperanza y su determinación es la luz que guía en las tinieblas de la adversidad.",modified: "",thumbnail: SuperHeroThumbnail(path: "https://i.annihil.us/u/prod/marvel/i/mg/3/20/5232158de5b16", extension: "jpg"),resourceURI: "",comics: SuperHeroComics(available: 1, collectionURI: "", items: [SuperHeroComicsItem(resourceURI: "", name: "Comic 1")], returned: 1),stories: SuperHeroComics(available: 12, collectionURI: "", items: [], returned: 12),events: SuperHeroComics(available: 12, collectionURI: "", items: [], returned: 12), series: SuperHeroComics(available: 12, collectionURI: "", items: [], returned: 12), urls: []), series: [Serie(id: 1, title: "Rocío", description: "", thumbnail: Thumbnail(path: "http://i.annihil.us/u/prod/marvel/i/mg/c/e0/535fecbbb9784", imageExtension: .jpg))])
+    HeroDetailView(hero: SuperHero(
+        id: 1, title: "",
+        name: "Rocío",
+        description: "Rocío, una guerrera feroz y noble...",
+        thumbnail: SuperHeroThumbnail(
+            path: "https://i.annihil.us/u/prod/marvel/i/mg/3/20/5232158de5b16",
+            extension: "jpg"
+        ),
+        resourceURI: ""
+        
+    ))
+    
 }

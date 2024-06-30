@@ -29,7 +29,7 @@ struct HerosRowView: View {
                     .padding([.leading, .trailing],20)
                     .opacity(0.6)
             }
-            Text(hero.name)
+            Text(hero.name!)
                 .font(.title)
                 .foregroundStyle(.gray)
                 .bold()
@@ -38,5 +38,5 @@ struct HerosRowView: View {
 }
 
 #Preview {
-    HerosRowView(hero: SuperHero(id: 1,name: "Rocío", description: "Rocío, una guerrera feroz y noble, empuña su espada con destreza mientras defiende los reinos de la injusticia. Dotada de habilidades sobrenaturales y un coraje inquebrantable, Valquiria lucha sin descanso para proteger a los inocentes y hacer prevalecer la justicia en un mundo lleno de peligros. Su valentía inspira esperanza y su determinación es la luz que guía en las tinieblas de la adversidad.",modified: "",thumbnail: SuperHeroThumbnail(path: "https://i.annihil.us/u/prod/marvel/i/mg/3/20/5232158de5b16", extension: "jpg"),resourceURI: "",comics: SuperHeroComics(available: 1, collectionURI: "", items: [SuperHeroComicsItem(resourceURI: "", name: "Comic 1")], returned: 1),stories: SuperHeroComics(available: 12, collectionURI: "", items: [], returned: 12),events: SuperHeroComics(available: 12, collectionURI: "", items: [], returned: 12),series: SuperHeroComics(available: 12, collectionURI: "", items: [], returned: 12),urls: []))
+    HerosRowView(hero: SuperHero(id: 1, title: "",name: "Rocío", description: "Rocío, una guerrera feroz y noble, empuña su espada con destreza mientras defiende los reinos de la injusticia. Dotada de habilidades sobrenaturales y un coraje inquebrantable, Valquiria lucha sin descanso para proteger a los inocentes y hacer prevalecer la justicia en un mundo lleno de peligros. Su valentía inspira esperanza y su determinación es la luz que guía en las tinieblas de la adversidad.",thumbnail: SuperHeroThumbnail(path: "https://i.annihil.us/u/prod/marvel/i/mg/3/20/5232158de5b16", extension: "jpg"), resourceURI: ""))
 }

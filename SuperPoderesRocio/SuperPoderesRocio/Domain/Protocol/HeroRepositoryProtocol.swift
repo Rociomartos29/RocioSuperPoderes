@@ -7,5 +7,6 @@
 
 import Foundation
 protocol HerosRepositoryProtocol {
-    func getHeros(filter: String) async throws -> [SuperHero]
+    func getHeros() async -> SuperHeroResponse
+    func getSeriesOfhero(hero:Int) async -> SuperHeroResponse
 }

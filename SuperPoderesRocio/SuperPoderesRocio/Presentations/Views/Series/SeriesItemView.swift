@@ -8,21 +8,17 @@
 import SwiftUI
 
 struct SeriesItemView: View {
-    var serie: Serie
-    var heroName: String
-    var series: [Serie]
-    var heroes: [SuperHero] = []
-    @StateObject var seriesViewModel = RootViewModel()
+    var serie:SuperHero
     
     var body: some View {
         HStack(spacing: 10) {
             // Imagen de la serie
-            AsyncImage(url: URL(string: "\(serie.thumbnail.path).\(serie.thumbnail.imageExtension)")) { image in
+            AsyncImage(url: URL(string: "\(serie.thumbnail.url(type: .portrait))")) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: 80, height: 80)
-                    .cornerRadius(10)
+                    .frame(width: 100, height: 150)
+                    .cornerRadius(25)
             } placeholder: {
                 Image(systemName: "photo")
                     .resizable()
@@ -33,7 +29,7 @@ struct SeriesItemView: View {
             
             // Título y descripción de la serie
             VStack(alignment: .leading, spacing: 4) {
-                Text(serie.title)
+                Text(serie.title!)
                     .font(.headline)
                     .fontWeight(.bold)
             }
@@ -43,21 +39,21 @@ struct SeriesItemView: View {
         .background(Color.white)
         .cornerRadius(12)
         .shadow(radius: 3)
-        .onAppear {
-            Task {
-                do {
-                    print("SeriesItemView appeared")
-                    try await seriesViewModel.loadSeriesForHeroes(heroes)
-                } catch {
-                    // Manejar el error aquí
-                    print("Error: \(error)")
-                }
-            }
-        }
     }
 }
+
 #Preview{
     
-    SeriesItemView(serie: Serie(id: 1, title: "Rocío", description: "", thumbnail: Thumbnail(path: "http://i.annihil.us/u/prod/marvel/i/mg/c/e0/535fecbbb9784", imageExtension: .jpg)), heroName: "Rocio", series: [])
+    SeriesItemView(serie: SuperHero(
+        id: 1, title: "",
+        name: "Rocío",
+        description: "Rocío, una guerrera feroz y noble...",
+        thumbnail: SuperHeroThumbnail(
+            path: "https://i.annihil.us/u/prod/marvel/i/mg/3/20/5232158de5b16",
+            extension: "jpg"
+        ),
+        resourceURI: ""
+        
+    ))
 }
 

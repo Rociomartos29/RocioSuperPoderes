@@ -15,20 +15,20 @@ struct HerosListView: View {
     var body: some View {
         NavigationStack{
             List{
-                ForEach(viewModel.heroes){ data in
-                    NavigationLink{
-                        HeroDetailView(hero: data, series: [])
-                    }label:{
-                        HerosRowView(hero: data)
-                        
+                if let data = viewModel.dataHeros?.data?.results{
+                    ForEach(data){ hero in
+                        // HeroRowView(hero: hero)
+                        NavigationLink(
+                            destination: HeroDetailView(hero: hero),
+                            label: {
+                                HerosRowView(hero: hero)
+                            })
                     }
-                    
-                    
                 }
             }
         }
-        .onAppear{
-            viewModel.fetchHeroes(filter: "")
+        .task{
+            await viewModel.fetchHeroes()
         }
         .searchable(text: $filter, prompt: Text("Buscar por nombre"))
     }

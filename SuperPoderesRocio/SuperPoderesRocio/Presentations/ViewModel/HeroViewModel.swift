@@ -9,50 +9,30 @@ import Foundation
 import Combine
 
 final class HeroViewModel: ObservableObject {
-    @Published var heroes: [SuperHero] = []
-    @Published var status = Status.none
+    @Published var dataHeros:SuperHeroResponse? // los datos del request
+    @Published var status = Status.none // estado de como va la cosa, para control desde la UI
+
+    //Use case object
+    private var useCaseheros : HerosUseCaseProtocol
     
-    let useCase: HerosUseCaseProtocol
-    private var cancellables = Set<AnyCancellable>()
+    var suscriptors = Set<AnyCancellable>()
     
-    init(useCase: HerosUseCaseProtocol = HerosUseCase()) {
-        self.useCase = useCase
+    init(useCase : HerosUseCaseProtocol = HerosUseCase()){
+        useCaseheros = useCase
     }
-    
-    func fetchHeroes(filter: String) {
-        self.status = .loading
+   
+    // Load Heros from API Marvel
+    @MainActor
+    func fetchHeroes() async {
+        self.status = Status.loading //Cambiamos el estado a Loading
         
-      
-    fetchData()
-               .receive(on: DispatchQueue.main) // Asegura que las actualizaciones se realicen en el hilo principal
-               .sink(receiveCompletion: { completion in
-                   switch completion {
-                   case .finished:
-                       break
-                   case .failure(let error):
-                       self.handleFailure(error)
-                   }
-               }, receiveValue: { heroes in
-                   self.heroes = heroes
-                   self.status = .loaded
-               })
-               .store(in: &cancellables)
-           }
-    private func fetchData() -> AnyPublisher<[SuperHero], Error> {
-        let url = URL(string:"\(Endpoints.heros.rawValue)")
-            
-        return URLSession.shared.dataTaskPublisher(for: url!)
-                .map { $0.data }
-                .decode(type: SuperHeroResponse.self, decoder: JSONDecoder())
-                .map { $0.data.results }
-                .mapError { error in
-                    error as? URLError ?? URLError(.unknown)
-                }
-                .eraseToAnyPublisher()
+        let data = await useCaseheros.getHeros()
+        
+        //set in main thread
+        DispatchQueue.main.async{
+            self.dataHeros = data
+            self.status = .loaded
         }
-    // Manejo de errores
-    private func handleFailure(_ error: Error) {
-        print("Error fetching heroes: \(error)")
-        self.status = .error(error: error.localizedDescription)
+
     }
 }

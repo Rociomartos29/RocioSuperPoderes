@@ -8,18 +8,23 @@
 import Foundation
 protocol HerosUseCaseProtocol{
     var repo: HerosRepositoryProtocol {get set}
-    func getHeros(filter: String) async throws -> [SuperHero]
+    func getHeros() async  -> SuperHeroResponse
+    func getSeriesOfhero(hero: Int) async -> SuperHeroResponse
 }
 
 final class HerosUseCase: HerosUseCaseProtocol {
     var repo: HerosRepositoryProtocol
     
-    init(repo: HerosRepositoryProtocol = HerosRepository(network: NetworkHeros()) as! HerosRepositoryProtocol) {
+    init(repo: HerosRepositoryProtocol = HerosRepository(network: NetworkHeros()) as HerosRepositoryProtocol) {
         self.repo = repo
     }
-
-    func getHeros(filter: String) async throws -> [SuperHero] {
-        return try await repo.getHeros(filter: filter)
+    
+    func getHeros() async  -> SuperHeroResponse{
+        return  await repo.getHeros()
+        
+    }
+    func getSeriesOfhero(hero: Int) async -> SuperHeroResponse {
+        return await repo.getSeriesOfhero(hero: hero)
     }
 }
 
@@ -29,8 +34,11 @@ final class HeroUseCaseFake: HerosUseCaseProtocol {
     init(repo: HerosRepositoryProtocol = HerosRepository(network: NetworkHeros())) {
         self.repo = repo
     }
-
-    func getHeros(filter: String) async throws -> [SuperHero] {
-        return try await repo.getHeros(filter: filter)
+    
+    func getHeros() async  -> SuperHeroResponse {
+        return  await repo.getHeros()
+    }
+    func getSeriesOfhero(hero: Int) async -> SuperHeroResponse {
+        return await repo.getSeriesOfhero(hero: hero)
     }
 }

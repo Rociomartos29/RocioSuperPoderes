@@ -10,18 +10,37 @@ import Foundation
 
 final class HerosRepository: HerosRepositoryProtocol {
     
-    
-    private let network: NetworkHeros
-    
-    init(network: NetworkHeros) {
+    private var network: NetworkHerosProtocol
+
+    init(network: NetworkHerosProtocol){
         self.network = network
     }
+
+    func getHeros() async -> SuperHeroResponse {
+       return await network.getHerosMarvel()
+    }
     
-    func getHeros(filter: String) async throws -> [SuperHero] {
-        do {
-            return try await network.getHeros(filter: filter)
-        } catch {
-            throw error
-        }
+    func getSeriesOfhero(hero: Int) async -> SuperHeroResponse {
+        return await network.getSeriesOfhero(hero: hero)
     }
 }
+
+
+//FAKE
+
+final class HerosRepositoryFake: HerosRepositoryProtocol{
+    private var network: NetworkHerosProtocol
+
+    init(network: NetworkHerosProtocol = NetworkHerosFake()){
+        self.network = network
+    }
+
+    func getHeros() async -> SuperHeroResponse {
+       return await network.getHerosMarvel()
+    }
+    
+    func getSeriesOfhero(hero: Int) async -> SuperHeroResponse {
+        return await network.getSeriesOfhero(hero: hero)
+    }
+}
+
